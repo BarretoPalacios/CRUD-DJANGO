@@ -1,8 +1,29 @@
 from django.shortcuts import render
+from django.http import HttpResponse
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import  User
 
 # Create your views here.
-def login(request):
-    return render(request,'login.html',{
-        'form':UserCreationForm
-    })
+def registrarse(request):
+    if request.method == 'GET':
+        return render(request,'registrarse.html',{'form':UserCreationForm})
+    else:
+        if request.POST['password1'] == request.POST['password2']:
+           try:
+               user = User.objects.create_user(
+               username=request.POST['username'],
+               password=request.POST['password1'])
+               user.save()
+               return HttpResponse("usuario creado correctamente")
+               
+           except:
+               return render(request,'registrarse.html',{
+                   'form':UserCreationForm,
+                   'error' : "usuario existente"
+                   }) 
+
+        return render(request,'registrarse.html',{
+                   'form':UserCreationForm,
+                   'error' : "contraseñas incorrectas"
+                   }) 
+    
